@@ -1,0 +1,191 @@
+version: "3.7"
+
+x-refs:
+  restart-3s: &restart-3s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+
+volumes:
+  db-data:
+    driver: local
+  redis-data:
+    driver: local
+  pip-data:
+    driver: local
+  yarn-data:
+    driver: local
+
+configs:
+  noiseblend-v0.toml:
+    file: ./noiseblend/staging.toml
+  spfy-v0.toml:
+    file: ./spfy/staging.toml
+  redis-v0.conf:
+    file: ./redis/redis.conf
+
+secrets:
+  redis_password-v0:
+    file: ./secrets/redis_password
+  redis_url-v0:
+    file: ./secrets/redis_url
+  spotify_client_id-v0:
+    file: ./secrets/spotify_client_id
+  spotify_client_secret-v0:
+    file: ./secrets/spotify_client_secret
+  unsplash_client_id-v0:
+    file: ./secrets/unsplash_client_id
+  unsplash_client_secret-v0:
+    file: ./secrets/unsplash_client_secret
+  sendgrid_api_key-v0:
+    file: ./secrets/sendgrid_api_key
+  postgres_password-v0:
+    file: ./secrets/postgres_password
+  alexa_secret-v0:
+    file: ./secrets/alexa_secret
+  sentry_dsn_api-v0:
+    file: ./secrets/sentry_dsn_api
+  sentry_dsn_frontend-v0:
+    file: ./secrets/sentry_dsn_frontend
+
+networks:
+  backend:
+    driver: overlay
+  frontend:
+    driver: overlay
+  postgres:
+    driver: overlay
+  redis:
+    driver: overlay
+  nginx:
+    external: true
+    name: noiseblend_nginx
+
+services:
+  api:
+    <<: *restart-3s
+    build:
+      context: $NOISEBLEND_API_DIR
+      dockerfile: Dockerfile
+    configs:
+      - source: noiseblend-v0.toml
+        target: /root/.config/noiseblend/develop.toml
+      - source: spfy-v0.toml
+        target: /root/.config/spfy/develop.toml
+    image: noiseblend/api:staging
+    environment:
+      SPFY_APP_CLIENT_ID__FILE: /run/secrets/spotify_client_id-v0
+      SPFY_APP_CLIENT_SECRET__FILE: /run/secrets/spotify_client_secret-v0
+      SPFY_UNSPLASH_AUTH_CLIENT_ID__FILE: /run/secrets/unsplash_client_id-v0
+      SPFY_UNSPLASH_AUTH_CLIENT_SECRET__FILE: /run/secrets/unsplash_client_id-v0
+      SPFY_REDIS_URL__FILE: /run/secrets/redis_url-v0
+      SPFY_DATABASE_CONNECTION_PASSWORD__FILE: /run/secrets/postgres_password-v0
+
+      NOISEBLEND_SPOTIFY_CLIENT_ID__FILE: /run/secrets/spotify_client_id-v0
+      NOISEBLEND_SPOTIFY_CLIENT_SECRET__FILE: /run/secrets/spotify_client_secret-v0
+      NOISEBLEND_DB_CONNECTION_PASSWORD__FILE: /run/secrets/postgres_password-v0
+      NOISEBLEND_SENDGRID_APIKEY__FILE: /run/secrets/sendgrid_api_key-v0
+      NOISEBLEND_REDIS_AUTH_PASSWORD__FILE: /run/secrets/redis_password-v0
+      NOISEBLEND_ALEXA_CLIENT_SECRET__FILE: /run/secrets/alexa_secret-v0
+      NOISEBLEND_SENTRY_DSN__FILE: /run/secrets/sentry_dsn_api-v0
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      backend:
+        aliases:
+          - api
+      redis:
+        aliases:
+          - api
+      postgres:
+        aliases:
+          - api
+      nginx:
+        aliases:
+          - api-staging
+    ports:
+      - "9004:9000"
+    secrets:
+      - redis_password-v0
+      - redis_url-v0
+      - spotify_client_id-v0
+      - spotify_client_secret-v0
+      - unsplash_client_id-v0
+      - unsplash_client_secret-v0
+      - sendgrid_api_key-v0
+      - postgres_password-v0
+      - alexa_secret-v0
+      - sentry_dsn_api-v0
+    volumes:
+      - pip-data:/cache
+
+  postgres:
+    <<: *restart-3s
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password-v0
+    image: postgres
+    networks:
+      - postgres
+    ports:
+      - "5435:5432"
+    secrets:
+      - postgres_password-v0
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./postgres/init.d:/docker-entrypoint-initdb.d:ro
+
+  frontend:
+    <<: *restart-3s
+    build:
+      context: $NOISEBLEND_UI_DIR
+      dockerfile: Dockerfile
+      args:
+        - SENTRY_DSN=https://7a3ddfbacc0c4e2d98f105aa0f184e0b@sentry.io/1209883
+        - SENTRY_AUTH_TOKEN
+        - SENTRY_RELEASE
+        - LOCAL_API_URL=http://api:9000/
+        - REMOTE_API_URL=https://staging-api.noiseblend.com/
+        - LOCAL_WS_URL=ws://api:9000
+        - REMOTE_WS_URL=wss://staging-api.noiseblend.com
+        - DOMAIN=staging.noiseblend.com
+    depends_on:
+      - api
+    image: noiseblend/ui:staging
+    environment:
+      NODE_ENV: production
+    networks:
+      frontend:
+        aliases:
+          - frontend
+      backend:
+        aliases:
+          - frontend
+      nginx:
+        aliases:
+          - frontend-staging
+    ports:
+      - "3004:3000"
+    volumes:
+      - yarn-data:/cache
+
+  redis:
+    <<: *restart-3s
+    command:
+      - /bin/sh
+      - -c
+      - cat /etc/redis.conf | sed "s/# requirepass \"\"/requirepass \"$$( cat /run/secrets/redis_password-v0 )\"/g" | redis-server -
+    configs:
+      - source: redis-v0.conf
+        target: /etc/redis.conf
+    image: redis:alpine
+    networks:
+      - redis
+    ports:
+      - "6384:6379"
+    secrets:
+      - redis_password-v0
+    volumes:
+      - redis-data:/data

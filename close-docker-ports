@@ -1,0 +1,5 @@
+#!/bin/bash
+for port in $@; do
+    sudo iptables -w -I DOCKER-USER -p udp -j REJECT --dport $port
+    sudo iptables -w -I DOCKER-USER -p tcp -j REJECT --dport $port
+done

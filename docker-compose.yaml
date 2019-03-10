@@ -1,0 +1,165 @@
+version: "3.7"
+
+volumes:
+  db-data:
+    driver: local
+  redis-data:
+    driver: local
+  pip-data:
+    driver: local
+  yarn-data:
+    driver: local
+
+configs:
+  noiseblend-v0.toml:
+    file: ./noiseblend/dev.toml
+  spfy-v0.toml:
+    file: ./spfy/dev.toml
+  redis-v0.conf:
+    file: ./redis/redis.conf
+
+secrets:
+  redis_password-v0:
+    file: ./secrets/redis_password
+  redis_url-v0:
+    file: ./secrets/redis_url
+  spotify_client_id-v0:
+    file: ./secrets/spotify_client_id
+  spotify_client_secret-v0:
+    file: ./secrets/spotify_client_secret
+  unsplash_client_id-v0:
+    file: ./secrets/unsplash_client_id
+  unsplash_client_secret-v0:
+    file: ./secrets/unsplash_client_secret
+  sendgrid_api_key-v0:
+    file: ./secrets/sendgrid_api_key
+  postgres_password-v0:
+    file: ./secrets/postgres_password
+  alexa_secret-v0:
+    file: ./secrets/alexa_secret
+  sentry_dsn_api-v0:
+    file: ./secrets/sentry_dsn_api
+  sentry_dsn_frontend-v0:
+    file: ./secrets/sentry_dsn_frontend
+
+networks:
+  backend:
+    driver: overlay
+  frontend:
+    driver: overlay
+  postgres:
+    driver: overlay
+  redis:
+    driver: overlay
+
+services:
+  api:
+    build:
+      context: $NOISEBLEND_API_DIR
+      dockerfile: Dockerfile-dev
+    configs:
+      - source: noiseblend-v0.toml
+        target: /root/.config/noiseblend/develop.toml
+      - source: spfy-v0.toml
+        target: /root/.config/spfy/develop.toml
+    environment:
+      SPFY_APP_CLIENT_ID__FILE: /run/secrets/spotify_client_id-v0
+      SPFY_APP_CLIENT_SECRET__FILE: /run/secrets/spotify_client_secret-v0
+      SPFY_UNSPLASH_AUTH_CLIENT_ID__FILE: /run/secrets/unsplash_client_id-v0
+      SPFY_UNSPLASH_AUTH_CLIENT_SECRET__FILE: /run/secrets/unsplash_client_id-v0
+      SPFY_REDIS_URL__FILE: /run/secrets/redis_url-v0
+      SPFY_DATABASE_CONNECTION_PASSWORD__FILE: /run/secrets/postgres_password-v0
+
+      NOISEBLEND_SPOTIFY_CLIENT_ID__FILE: /run/secrets/spotify_client_id-v0
+      NOISEBLEND_SPOTIFY_CLIENT_SECRET__FILE: /run/secrets/spotify_client_secret-v0
+      NOISEBLEND_DB_CONNECTION_PASSWORD__FILE: /run/secrets/postgres_password-v0
+      NOISEBLEND_SENDGRID_APIKEY__FILE: /run/secrets/sendgrid_api_key-v0
+      NOISEBLEND_REDIS_AUTH_PASSWORD__FILE: /run/secrets/redis_password-v0
+      NOISEBLEND_WORKER_REDIS_AUTH_PASSWORD__FILE: /run/secrets/redis_password-v0
+      NOISEBLEND_ALEXA_CLIENT_SECRET__FILE: /run/secrets/alexa_secret-v0
+      NOISEBLEND_SENTRY_DSN__FILE: /run/secrets/sentry_dsn_api-v0
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - backend
+      - redis
+      - postgres
+    ports:
+      - "9003:9000"
+    secrets:
+      - redis_password-v0
+      - redis_url-v0
+      - spotify_client_id-v0
+      - spotify_client_secret-v0
+      - unsplash_client_id-v0
+      - unsplash_client_secret-v0
+      - sendgrid_api_key-v0
+      - postgres_password-v0
+      - alexa_secret-v0
+      - sentry_dsn_api-v0
+    volumes:
+      - pip-data:/cache
+      - ./noiseblend/dev.toml:/root/.config/noiseblend/develop.toml:ro
+      - ./spfy/dev.toml:/root/.config/spfy/develop.toml:ro
+      - $NOISEBLEND_API_DIR:/app
+      - $SPFY_DIR:/spfy
+
+  postgres:
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password-v0
+    image: postgres
+    networks:
+      - postgres
+    ports:
+      - "5434:5432"
+    secrets:
+      - postgres_password-v0
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./postgres/init.d:/docker-entrypoint-initdb.d:ro
+
+  frontend:
+    build:
+      context: $NOISEBLEND_UI_DIR
+      dockerfile: Dockerfile-dev
+      args:
+        - SENTRY_DSN=https://7a3ddfbacc0c4e2d98f105aa0f184e0b@sentry.io/1209883
+        - SENTRY_AUTH_TOKEN
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: development
+      LOCAL_API_URL: http://api:9000/
+      REMOTE_API_URL: http://localhost:9003/
+      LOCAL_WS_URL: ws://api:9000
+      REMOTE_WS_URL: ws://localhost:9003
+      DOMAIN: localhost:3003
+    networks:
+      - frontend
+      - backend
+    ports:
+      - "3003:3000"
+      - "4002:4002"
+    volumes:
+      - yarn-data:/cache
+      - $NOISEBLEND_UI_DIR:/app
+
+  redis:
+    command:
+      - /bin/sh
+      - -c
+      - cat /etc/redis.conf | sed "s/# requirepass \"\"/requirepass \"$$( cat /run/secrets/redis_password-v0 )\"/g" | redis-server -
+    configs:
+      - source: redis-v0.conf
+        target: /etc/redis.conf
+    image: redis:alpine
+    networks:
+      - redis
+    ports:
+      - "6383:6379"
+    secrets:
+      - redis_password-v0
+    volumes:
+      - redis-data:/data
+      - ./redis/redis.conf:/etc/redis.conf:ro

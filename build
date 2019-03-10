@@ -1,0 +1,29 @@
+#!/bin/bash
+
+SERVICE=$1
+if [[ $SERVICE == "api" ]]; then
+    export SENTRY_RELEASE=$(git --git-dir=$NOISEBLEND_API_DIR/.git rev-parse HEAD)
+elif [[ $SERVICE == "frontend" ]]; then
+    export SENTRY_RELEASE=$(git --git-dir=$NOISEBLEND_UI_DIR/.git rev-parse HEAD)
+else
+    echo "Service unrecognized: $SERVICE"
+    exit 1
+fi
+
+STACK=${2:-noiseblend}
+PUSH=$3
+
+if [[ $STACK == "push" ]]; then
+    STACK="noiseblend"
+    PUSH="push"
+fi
+
+if [[ ! -f docker-compose-$STACK.yaml ]]; then
+    echo "Stack unrecognized: $STACK"
+    exit 1
+fi
+
+docker-compose -f docker-compose-$STACK.yaml build $SERVICE
+if [[ $? -eq 0 && $PUSH == "push" ]]; then
+    docker-compose -f docker-compose-$STACK.yaml push $SERVICE
+fi
