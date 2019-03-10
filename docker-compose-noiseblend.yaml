@@ -29,7 +29,7 @@ configs:
     file: ./spfy/dev.toml
   redis-v0.conf:
     file: ./redis/redis.conf
-  noiseblend-v0.com:
+  noiseblend-v1.com:
     file: ./nginx/noiseblend.com
   nginx-v0.conf:
     file: ./nginx/nginx.conf
@@ -238,7 +238,7 @@ services:
         target: /etc/nginx/proxy_params
       - source: ssl_params-v0
         target: /etc/nginx/ssl_params
-      - source: noiseblend-v0.com
+      - source: noiseblend-v1.com
         target: /etc/nginx/sites-enabled/noiseblend.com
     image: nginx
     networks:
