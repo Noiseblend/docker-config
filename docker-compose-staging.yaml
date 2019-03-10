@@ -19,7 +19,7 @@ volumes:
     driver: local
 
 configs:
-  noiseblend-v0.toml:
+  noiseblend-v1.toml:
     file: ./noiseblend/staging.toml
   spfy-v0.toml:
     file: ./spfy/staging.toml
@@ -70,7 +70,7 @@ services:
       context: $NOISEBLEND_API_DIR
       dockerfile: Dockerfile
     configs:
-      - source: noiseblend-v0.toml
+      - source: noiseblend-v1.toml
         target: /root/.config/noiseblend/develop.toml
       - source: spfy-v0.toml
         target: /root/.config/spfy/develop.toml
