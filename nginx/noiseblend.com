@@ -115,6 +115,7 @@ server {
            add_header 'Content-Type' 'text/plain; charset=utf-8';
            add_header 'Content-Length' 0;
            return 204;
+        }
         if ($request_method = 'POST') {
            add_header 'Access-Control-Allow-Origin' 'https://www.noiseblend.com';
            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
@@ -155,6 +156,7 @@ server {
            add_header 'Content-Type' 'text/plain; charset=utf-8';
            add_header 'Content-Length' 0;
            return 204;
+        }
         if ($request_method = 'POST') {
            add_header 'Access-Control-Allow-Origin' 'https://staging.noiseblend.com';
            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
