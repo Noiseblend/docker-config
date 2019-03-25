@@ -34,6 +34,10 @@ speaker = ""
 app_name = "Noiseblend"
 
 [redis]
+host = "redis"
+port = 6379
+password = ""
+
 url = ""
 minsize = 1
 maxsize = 10

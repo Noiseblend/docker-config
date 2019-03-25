@@ -81,6 +81,7 @@ services:
       SPFY_UNSPLASH_AUTH_CLIENT_ID__FILE: /run/secrets/unsplash_client_id-v0
       SPFY_UNSPLASH_AUTH_CLIENT_SECRET__FILE: /run/secrets/unsplash_client_id-v0
       SPFY_REDIS_URL__FILE: /run/secrets/redis_url-v0
+      SPFY_REDIS_PASSWORD__FILE: /run/secrets/redis_password-v0
       SPFY_DATABASE_CONNECTION_PASSWORD__FILE: /run/secrets/postgres_password-v0
 
       NOISEBLEND_SPOTIFY_CLIENT_ID__FILE: /run/secrets/spotify_client_id-v0
