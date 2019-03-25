@@ -24,9 +24,9 @@ volumes:
 
 configs:
   noiseblend-v0.toml:
-    file: ./noiseblend/dev.toml
+    file: ./noiseblend/production.toml
   spfy-v0.toml:
-    file: ./spfy/dev.toml
+    file: ./spfy/production.toml
   redis-v0.conf:
     file: ./redis/redis.conf
   noiseblend-v0.com:
