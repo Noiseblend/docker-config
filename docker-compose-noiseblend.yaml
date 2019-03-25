@@ -23,13 +23,13 @@ volumes:
     driver: local
 
 configs:
-  noiseblend-v1.toml:
+  noiseblend-v0.toml:
     file: ./noiseblend/dev.toml
   spfy-v0.toml:
     file: ./spfy/dev.toml
   redis-v0.conf:
     file: ./redis/redis.conf
-  noiseblend-v3.com:
+  noiseblend-v0.com:
     file: ./nginx/noiseblend.com
   nginx-v0.conf:
     file: ./nginx/nginx.conf
@@ -39,12 +39,8 @@ configs:
     file: ./nginx/ssl_params
   cors_headers-v0:
     file: ./nginx/cors_headers
-  cors_headers_options-v0:
-    file: ./nginx/cors_headers_options
   staging_cors_headers-v0:
     file: ./nginx/staging_cors_headers
-  staging_cors_headers_options-v0:
-    file: ./nginx/staging_cors_headers_options
 
 secrets:
   redis_password-v0:
@@ -97,7 +93,7 @@ services:
       context: $NOISEBLEND_API_DIR
       dockerfile: Dockerfile
     configs:
-      - source: noiseblend-v1.toml
+      - source: noiseblend-v0.toml
         target: /root/.config/noiseblend/develop.toml
       - source: spfy-v0.toml
         target: /root/.config/spfy/develop.toml
@@ -247,14 +243,10 @@ services:
       - source: ssl_params-v0
         target: /etc/nginx/ssl_params
       - source: cors_headers-v0
-        target: /etc/nginx/ssl_params
-      - source: cors_headers_options-v0
-        target: /etc/nginx/ssl_params
+        target: /etc/nginx/cors_headers
       - source: staging_cors_headers-v0
-        target: /etc/nginx/ssl_params
-      - source: staging_cors_headers_options-v0
-        target: /etc/nginx/ssl_params
-      - source: noiseblend-v3.com
+        target: /etc/nginx/staging_cors_headers
+      - source: noiseblend-v0.com
         target: /etc/nginx/sites-enabled/noiseblend.com
     image: nginx
     networks:

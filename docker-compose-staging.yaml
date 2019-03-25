@@ -19,7 +19,7 @@ volumes:
     driver: local
 
 configs:
-  noiseblend-v1.toml:
+  noiseblend-v0.toml:
     file: ./noiseblend/staging.toml
   spfy-v0.toml:
     file: ./spfy/staging.toml
@@ -70,7 +70,7 @@ services:
       context: $NOISEBLEND_API_DIR
       dockerfile: Dockerfile
     configs:
-      - source: noiseblend-v1.toml
+      - source: noiseblend-v0.toml
         target: /root/.config/noiseblend/develop.toml
       - source: spfy-v0.toml
         target: /root/.config/spfy/develop.toml
@@ -146,9 +146,9 @@ services:
         - SENTRY_DSN=https://7a3ddfbacc0c4e2d98f105aa0f184e0b@sentry.io/1209883
         - SENTRY_AUTH_TOKEN
         - SENTRY_RELEASE
-        - LOCAL_API_URL=http://api:9000/
+        - LOCAL_API_URL=http://api-staging:9000/
         - REMOTE_API_URL=https://staging-api.noiseblend.com/
-        - LOCAL_WS_URL=ws://api:9000
+        - LOCAL_WS_URL=ws://api-staging:9000
         - REMOTE_WS_URL=wss://staging-api.noiseblend.com
         - DOMAIN=staging.noiseblend.com
     depends_on:

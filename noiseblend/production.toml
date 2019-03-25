@@ -22,12 +22,6 @@ scope = [
 
 [api]
 cors = false
-allow_origins = [
-    "https://www.noiseblend.com",
-    "https://www.noiseblend.com:3000",
-    "https://noiseblend.com",
-    "https://noiseblend.com:3000"
-]
 
 [db]
 create_tables = true

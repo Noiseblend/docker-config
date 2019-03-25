@@ -106,22 +106,16 @@ server {
     access_log /dev/stdout;
     error_log stderr;
 
+    include cors_headers;
     location / {
-        if ($request_method = 'OPTIONS') {
-          include cors_headers_options;
-          return 204;
-        }
-        if ($request_method = 'POST') {
-          include cors_headers;
-        }
-        if ($request_method = 'GET') {
-          include cors_headers;
-        }
-
         set $upstream "api";
         proxy_pass  http://$upstream:9000;
         include     proxy_params;
         proxy_pass_request_headers      on;
+
+        if ($request_method = 'OPTIONS') {
+          return 204;
+        }
     }
 }
 
@@ -136,22 +130,16 @@ server {
     access_log /dev/stdout;
     error_log stderr;
 
+    include staging_cors_headers;
     location / {
-        if ($request_method = 'OPTIONS') {
-          include staging_cors_headers_options;
-          return 204;
-        }
-        if ($request_method = 'POST') {
-          include staging_cors_headers;
-        }
-        if ($request_method = 'GET') {
-          include staging_cors_headers;
-        }
-
         set $upstream "api-staging";
         proxy_pass  http://$upstream:9000;
         include     proxy_params;
         proxy_pass_request_headers      on;
+
+        if ($request_method = 'OPTIONS') {
+          return 204;
+        }
     }
 }
 
