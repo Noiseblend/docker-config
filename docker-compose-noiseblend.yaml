@@ -37,9 +37,9 @@ configs:
     file: ./nginx/proxy_params
   ssl_params-v0:
     file: ./nginx/ssl_params
-  cors_headers-v1:
+  cors_headers-v2:
     file: ./nginx/cors_headers
-  staging_cors_headers-v1:
+  staging_cors_headers-v2:
     file: ./nginx/staging_cors_headers
 
 secrets:
@@ -243,9 +243,9 @@ services:
         target: /etc/nginx/proxy_params
       - source: ssl_params-v0
         target: /etc/nginx/ssl_params
-      - source: cors_headers-v1
+      - source: cors_headers-v2
         target: /etc/nginx/cors_headers
-      - source: staging_cors_headers-v1
+      - source: staging_cors_headers-v2
         target: /etc/nginx/staging_cors_headers
       - source: noiseblend-v0.com
         target: /etc/nginx/sites-enabled/noiseblend.com
