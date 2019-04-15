@@ -33,7 +33,7 @@ configs:
     file: ./nginx/noiseblend.com
   nginx-v0.conf:
     file: ./nginx/nginx.conf
-  proxy_params-v0:
+  proxy_params-v1:
     file: ./nginx/proxy_params
   ssl_params-v0:
     file: ./nginx/ssl_params
@@ -239,7 +239,7 @@ services:
     configs:
       - source: nginx-v0.conf
         target: /etc/nginx/nginx.conf
-      - source: proxy_params-v0
+      - source: proxy_params-v1
         target: /etc/nginx/proxy_params
       - source: ssl_params-v0
         target: /etc/nginx/ssl_params
