@@ -29,7 +29,24 @@ server {
     access_log /dev/stdout;
     error_log stderr;
 
-    root /static;
+    root /static/Noiseblend;
+    location / {
+
+    }
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    include     ssl_params;
+
+    server_name static.lunar.fyi;
+
+    access_log /dev/stdout;
+    error_log stderr;
+
+    root /static/Lunar;
     location / {
 
     }
@@ -51,7 +68,7 @@ server {
     }
 
     location ~ /(favicon\.ico|robots\.txt|sitemap\.xml)$ {
-        root /static/;
+        root /static/Noiseblend/;
         autoindex off;
         expires  14d;
         add_header Cache-Control public;
@@ -81,7 +98,7 @@ server {
     }
 
     location ~ /(favicon\.ico|robots\.txt|sitemap\.xml)$ {
-        root /static/;
+        root /static/Noiseblend/;
         autoindex off;
         expires  14d;
         add_header Cache-Control public;
