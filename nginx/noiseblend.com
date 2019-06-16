@@ -39,7 +39,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include     ssl_params;
+    include     lunar_ssl_params;
 
     server_name static.lunar.fyi;
 

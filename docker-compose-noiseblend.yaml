@@ -37,6 +37,8 @@ configs:
     file: ./nginx/proxy_params
   ssl_params-v0:
     file: ./nginx/ssl_params
+  lunar_ssl_params-v0:
+    file: ./nginx/lunar_ssl_params
   cors_headers-v2:
     file: ./nginx/cors_headers
   staging_cors_headers-v2:
@@ -65,6 +67,10 @@ secrets:
     file: ./secrets/noiseblend.cert.pem
   noiseblend-v0.key.pem:
     file: ./secrets/noiseblend.key.pem
+  lunar-v0.cert.pem:
+    file: ./secrets/lunar.cert.pem
+  lunar-v0.key.pem:
+    file: ./secrets/lunar.key.pem
   cloudflare-v0.crt:
     file: ./secrets/cloudflare.crt
   sentry_dsn_api-v0:
@@ -243,6 +249,8 @@ services:
         target: /etc/nginx/proxy_params
       - source: ssl_params-v0
         target: /etc/nginx/ssl_params
+      - source: lunar_ssl_params-v0
+        target: /etc/nginx/lunar_ssl_params
       - source: cors_headers-v2
         target: /etc/nginx/cors_headers
       - source: staging_cors_headers-v2
@@ -258,6 +266,8 @@ services:
     secrets:
       - noiseblend-v0.cert.pem
       - noiseblend-v0.key.pem
+      - lunar-v0.cert.pem
+      - lunar-v0.key.pem
       - cloudflare-v0.crt
     volumes:
       - $NOISEBLEND_UI_DIR/static:/static
