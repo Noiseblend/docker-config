@@ -270,4 +270,5 @@ services:
       - lunar-v0.key.pem
       - cloudflare-v0.crt
     volumes:
-      - $NOISEBLEND_UI_DIR/static:/static
+      - $NOISEBLEND_UI_DIR/static:/static/Noiseblend
+      - /static/Lunar:/static/Lunar
