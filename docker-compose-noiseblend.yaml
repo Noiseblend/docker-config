@@ -71,7 +71,7 @@ secrets:
     file: ./secrets/lunar.cert.pem
   lunar-v0.key.pem:
     file: ./secrets/lunar.key.pem
-  cloudflare-v0.crt:
+  cloudflare-v1.crt:
     file: ./secrets/cloudflare.crt
   sentry_dsn_api-v0:
     file: ./secrets/sentry_dsn_api
