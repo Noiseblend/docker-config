@@ -39,7 +39,7 @@ configs:
     file: ./nginx/ssl_params
   lunar_ssl_params-v1:
     file: ./nginx/lunar_ssl_params
-  alinpanaitiu_ssl_params-v1:
+  alinpanaitiu_ssl_params-v0:
     file: ./nginx/alinpanaitiu_ssl_params
   cors_headers-v2:
     file: ./nginx/cors_headers
