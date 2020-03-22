@@ -29,7 +29,7 @@ configs:
     file: ./spfy/production.toml
   redis-v0.conf:
     file: ./redis/redis.conf
-  noiseblend-v2.com:
+  noiseblend-v3.com:
     file: ./nginx/noiseblend.com
   nginx-v0.conf:
     file: ./nginx/nginx.conf
@@ -263,7 +263,7 @@ services:
         target: /etc/nginx/cors_headers
       - source: staging_cors_headers-v2
         target: /etc/nginx/staging_cors_headers
-      - source: noiseblend-v2.com
+      - source: noiseblend-v3.com
         target: /etc/nginx/sites-enabled/noiseblend.com
     image: nginx
     networks:
