@@ -52,6 +52,22 @@ server {
     }
 }
 
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    include     alinpanaitiu_ssl_params;
+
+    server_name static.alinpanaitiu.com;
+
+    access_log /dev/stdout;
+    error_log stderr;
+
+    root /static/alinpanaitiu;
+    location / {
+
+    }
+}
+
 
 server {
     listen 443 ssl http2;
