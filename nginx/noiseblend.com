@@ -47,6 +47,10 @@ server {
     error_log stderr;
 
     root /static/Lunar;
+    autoindex off;
+    expires  14d;
+    add_header Cache-Control public;
+
     location / {
 
     }
@@ -63,6 +67,10 @@ server {
     error_log stderr;
 
     root /static/alinpanaitiu;
+    autoindex off;
+    expires  14d;
+    add_header Cache-Control public;
+
     location / {
 
     }
