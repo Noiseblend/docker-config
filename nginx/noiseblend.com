@@ -26,7 +26,7 @@ server {
 
     server_name static.noiseblend.com;
 
-    access_log /dev/stdout;
+    access_log /dev/stdout main;
     error_log stderr;
 
     root /static/Noiseblend;
@@ -43,7 +43,7 @@ server {
 
     server_name www.noiseblend.com;
 
-    access_log /dev/stdout;
+    access_log /dev/stdout main;
     error_log stderr;
 
     location ~* \.js\.map$ {
@@ -73,7 +73,7 @@ server {
 
     server_name staging.noiseblend.com;
 
-    access_log /dev/stdout;
+    access_log /dev/stdout main;
     error_log stderr;
 
     location ~* \.js\.map$ {
@@ -103,7 +103,7 @@ server {
 
     server_name api.noiseblend.com;
 
-    access_log /dev/stdout;
+    access_log /dev/stdout main;
     error_log stderr;
 
     include /etc/nginx/cors_headers;
@@ -127,7 +127,7 @@ server {
 
     server_name staging-api.noiseblend.com;
 
-    access_log /dev/stdout;
+    access_log /dev/stdout main;
     error_log stderr;
 
     include /etc/nginx/staging_cors_headers;
@@ -151,7 +151,7 @@ server {
 
     server_name swarmpit.noiseblend.com;
 
-    access_log /dev/stdout;
+    access_log /dev/stdout main;
     error_log stderr;
 
     location / {

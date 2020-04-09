@@ -50,6 +50,7 @@ services:
         target: /etc/promtail/config.yaml
     volumes:
       - promtail-data:/data
+      - /var/log:/var/log
       - /var/log/lunar-analytics:/var/log/lunar-analytics:ro
     networks:
       - loki

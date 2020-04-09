@@ -12,7 +12,7 @@ server {
 
     server_name static.alinpanaitiu.com;
 
-    access_log /dev/stdout;
+    access_log /dev/stdout main;
     error_log stderr;
 
     root /static/alinpanaitiu;
@@ -32,7 +32,7 @@ server {
 
     server_name grafana.alinpanaitiu.com;
 
-    access_log /dev/stdout;
+    access_log /dev/stdout main;
     error_log stderr;
 
     location / {

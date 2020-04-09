@@ -9,10 +9,35 @@ clients:
   - url: http://loki:3100/loki/api/v1/push
 
 scrape_configs:
-- job_name: system
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: varlogs
-      __path__: /var/log/*log
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*log
+  - job_name: lunar-analytics
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: lunar-analytics
+          __path__: /var/log/lunar-analytics
+    pipeline_stages:
+      - match:
+          selector: '{name="lunar-analytics"} |~ ".* -$"'
+          action: drop
+      - regex:
+          expression: '.*ts=(?P<timestamp>\S+) ip=(?P<ip>\S+) country=(?P<country>\S+) id=(?P<id>\S+) version=(?P<version>\S+) clamshell=(?P<clamshell>\S+) displays=(?P<displays>\S+) mode=(?P<mode>\S+) machine=(?P<machine>\S+).*'
+      - labels:
+          ip:
+          country:
+          id:
+          version:
+          clamshell:
+          displays:
+          mode:
+          machine:
+      - timestamp:
+          format: RFC3339
+          source: timestamp
