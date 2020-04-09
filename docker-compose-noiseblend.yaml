@@ -25,15 +25,15 @@ configs:
     file: ./spfy/production.toml
   redis-v0.conf:
     file: ./redis/redis.conf
-  noiseblend-v5.com:
+  noiseblend-v6.com:
     file: ./nginx/noiseblend.com
-  lunar-v0.fyi:
+  lunar-v2.fyi:
     file: ./nginx/lunar.fyi
-  alinpanaitiu-v0.com:
+  alinpanaitiu-v1.com:
     file: ./nginx/alinpanaitiu.com
   cloudflare-v0:
     file: ./nginx/cloudflare
-  nginx-v1.conf:
+  nginx-v4.conf:
     file: ./nginx/nginx.conf
   proxy_params-v1:
     file: ./nginx/proxy_params
@@ -217,10 +217,10 @@ services:
   nginx:
     <<: *restart-3s
     configs:
-      - source: nginx-v1.conf
-        target: /etc/nginx/nginx.conf
+      - source: nginx-v4.conf
+        target: /usr/local/openresty/nginx/conf/nginx.conf
       - source: cloudflare-v0
-        target: /etc/nginx/cloudflare
+        target: /etc/nginx/conf.d/cloudflare.conf
       - source: proxy_params-v1
         target: /etc/nginx/proxy_params
       - source: ssl_params-v1
@@ -233,13 +233,13 @@ services:
         target: /etc/nginx/cors_headers
       - source: staging_cors_headers-v2
         target: /etc/nginx/staging_cors_headers
-      - source: noiseblend-v5.com
-        target: /etc/nginx/sites-enabled/noiseblend.com
-      - source: lunar-v0.fyi
-        target: /etc/nginx/sites-enabled/lunar.fyi
-      - source: alinpanaitiu-v0.com
-        target: /etc/nginx/sites-enabled/alinpanaitiu.com
-    image: nginx
+      - source: noiseblend-v6.com
+        target: /etc/nginx/conf.d/noiseblend.com.conf
+      - source: lunar-v2.fyi
+        target: /etc/nginx/conf.d/lunar.fyi.conf
+      - source: alinpanaitiu-v1.com
+        target: /etc/nginx/conf.d/alinpanaitiu.com.conf
+    image: openresty/openresty:bionic
     networks:
       - nginx
     ports:

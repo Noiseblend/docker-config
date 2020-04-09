@@ -8,7 +8,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include     lunar_ssl_params;
+    include     /etc/nginx/lunar_ssl_params;
 
     server_name static.lunar.fyi;
 
@@ -25,15 +25,18 @@ server {
     }
 }
 
+log_format lunar 'ip=$http_cf_connecting_ip country=$http_cf_ipcountry $request_body';
+
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include     lunar_ssl_params;
+    include     /etc/nginx/lunar_ssl_params;
 
     server_name log.lunar.fyi;
 
     access_log /dev/stdout;
     error_log stderr;
+
 
     location /analytics {
         auth_basic "Restricted";

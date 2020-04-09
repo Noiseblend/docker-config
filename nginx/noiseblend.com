@@ -2,7 +2,7 @@ server {
     listen 80;
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include ssl_params;
+    include /etc/nginx/ssl_params;
 
     server_name noiseblend.com;
     return 301 https://www.noiseblend.com$request_uri;
@@ -22,7 +22,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include     ssl_params;
+    include     /etc/nginx/ssl_params;
 
     server_name static.noiseblend.com;
 
@@ -39,7 +39,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include     ssl_params;
+    include     /etc/nginx/ssl_params;
 
     server_name www.noiseblend.com;
 
@@ -60,7 +60,7 @@ server {
     location / {
         set $upstream "frontend";
         proxy_pass  http://$upstream:3000;
-        include     proxy_params;
+        include     /etc/nginx/proxy_params;
         proxy_pass_request_headers      on;
     }
 }
@@ -69,7 +69,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include     ssl_params;
+    include     /etc/nginx/ssl_params;
 
     server_name staging.noiseblend.com;
 
@@ -90,7 +90,7 @@ server {
     location / {
         set $upstream "frontend-staging";
         proxy_pass  http://$upstream:3000;
-        include     proxy_params;
+        include     /etc/nginx/proxy_params;
         proxy_pass_request_headers      on;
     }
 }
@@ -99,18 +99,18 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include     ssl_params;
+    include     /etc/nginx/ssl_params;
 
     server_name api.noiseblend.com;
 
     access_log /dev/stdout;
     error_log stderr;
 
-    include cors_headers;
+    include /etc/nginx/cors_headers;
     location / {
         set $upstream "api";
         proxy_pass  http://$upstream:9000;
-        include     proxy_params;
+        include     /etc/nginx/proxy_params;
         proxy_pass_request_headers      on;
 
         if ($request_method = 'OPTIONS') {
@@ -123,18 +123,18 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include     ssl_params;
+    include     /etc/nginx/ssl_params;
 
     server_name staging-api.noiseblend.com;
 
     access_log /dev/stdout;
     error_log stderr;
 
-    include staging_cors_headers;
+    include /etc/nginx/staging_cors_headers;
     location / {
         set $upstream "api-staging";
         proxy_pass  http://$upstream:9000;
-        include     proxy_params;
+        include     /etc/nginx/proxy_params;
         proxy_pass_request_headers      on;
 
         if ($request_method = 'OPTIONS') {
@@ -147,7 +147,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    include     ssl_params;
+    include     /etc/nginx/ssl_params;
 
     server_name swarmpit.noiseblend.com;
 
@@ -157,7 +157,7 @@ server {
     location / {
         set $upstream "swarmpit";
         proxy_pass  http://$upstream:8080;
-        include     proxy_params;
+        include     /etc/nginx/proxy_params;
         proxy_pass_request_headers      on;
     }
 }
