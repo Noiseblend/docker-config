@@ -17,10 +17,6 @@ volumes:
     driver: local
   yarn-data:
     driver: local
-  swarmpit-data:
-    driver: local
-  couchdb-data:
-    driver: local
 
 configs:
   noiseblend-v0.toml:
@@ -29,9 +25,15 @@ configs:
     file: ./spfy/production.toml
   redis-v0.conf:
     file: ./redis/redis.conf
-  noiseblend-v4.com:
+  noiseblend-v5.com:
     file: ./nginx/noiseblend.com
-  nginx-v0.conf:
+  lunar-v0.fyi:
+    file: ./nginx/lunar.fyi
+  alinpanaitiu-v0.com:
+    file: ./nginx/alinpanaitiu.com
+  cloudflare-v0:
+    file: ./nginx/cloudflare
+  nginx-v1.conf:
     file: ./nginx/nginx.conf
   proxy_params-v1:
     file: ./nginx/proxy_params
@@ -47,6 +49,8 @@ configs:
     file: ./nginx/staging_cors_headers
 
 secrets:
+  htpasswd-v0:
+    file: ./secrets/htpasswd
   redis_password-v0:
     file: ./secrets/redis_password
   redis_url-v0:
@@ -92,8 +96,6 @@ networks:
   postgres:
     driver: overlay
   redis:
-    driver: overlay
-  swarmpit:
     driver: overlay
   nginx:
     driver: overlay
@@ -212,45 +214,13 @@ services:
     volumes:
       - redis-data:/data
 
-  couchdb:
-    <<: *restart-3s
-    image: klaemo/couchdb:2.0.0
-    networks:
-      - swarmpit
-    ports:
-      - "5986:5984"
-    volumes:
-      - couchdb-data:/opt/couchdb/data
-
-  swarmpit:
-    <<: *restart-3s
-    environment:
-      SWARMPIT_DB: http://couchdb:5984
-      SWARMPIT_WORKDIR: /var/lib/swarmpit
-    image: swarmpit/swarmpit:latest
-    networks:
-      - swarmpit
-      - nginx
-    ports:
-      - "888:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - swarmpit-data:/var/lib/swarmpit
-
-  swarmpit-agent:
-    environment:
-      DOCKER_API_VERSION: "1.35"
-    image: swarmpit/agent:latest
-    networks:
-      - swarmpit
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-
   nginx:
     <<: *restart-3s
     configs:
-      - source: nginx-v0.conf
+      - source: nginx-v1.conf
         target: /etc/nginx/nginx.conf
+      - source: cloudflare-v0
+        target: /etc/nginx/cloudflare
       - source: proxy_params-v1
         target: /etc/nginx/proxy_params
       - source: ssl_params-v1
@@ -263,8 +233,12 @@ services:
         target: /etc/nginx/cors_headers
       - source: staging_cors_headers-v2
         target: /etc/nginx/staging_cors_headers
-      - source: noiseblend-v4.com
+      - source: noiseblend-v5.com
         target: /etc/nginx/sites-enabled/noiseblend.com
+      - source: lunar-v0.fyi
+        target: /etc/nginx/sites-enabled/lunar.fyi
+      - source: alinpanaitiu-v0.com
+        target: /etc/nginx/sites-enabled/alinpanaitiu.com
     image: nginx
     networks:
       - nginx
@@ -279,6 +253,9 @@ services:
       - alinpanaitiu-v0.cert.pem
       - alinpanaitiu-v0.key.pem
       - cloudflare-v2.crt
+      - htpasswd-v0
     volumes:
       - $NOISEBLEND_UI_DIR/static:/static/Noiseblend
       - /static/Lunar:/static/Lunar
+      - /static/alinpanaitiu:/static/alinpanaitiu
+      - /var/log/lunar-analytics:/var/log/lunar-analytics

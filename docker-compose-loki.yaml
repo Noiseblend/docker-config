@@ -1,0 +1,69 @@
+version: "3.7"
+
+volumes:
+  loki-data:
+    driver: local
+  promtail-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  loki:
+    driver: overlay
+  nginx:
+    external: true
+    name: loki_nginx
+
+secrets:
+  grafana_password-v0:
+    file: ./secrets/grafana_password
+
+configs:
+  loki-v0.yaml:
+    file: ./loki/loki.yaml
+  promtail-v0.yaml:
+    file: ./loki/promtail.yaml
+
+services:
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/config.yaml
+    configs:
+      - source: loki-v0.yaml
+        target: /etc/loki/config.yaml
+    volumes:
+      - loki-data:/loki
+      - /var/log:/var/log
+    networks:
+      - loki
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yaml
+    configs:
+      - source: promtail-v0.yaml
+        target: /etc/promtail/config.yaml
+    volumes:
+      - promtail-data:/data
+      - /var/log/lunar-analytics:/var/log/lunar-analytics:ro
+    networks:
+      - loki
+
+  grafana:
+    image: grafana/grafana:master
+    ports:
+      - "3006:3000"
+    networks:
+      - loki
+      - nginx
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana_password-v0
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    secrets:
+      - grafana_password-v0
