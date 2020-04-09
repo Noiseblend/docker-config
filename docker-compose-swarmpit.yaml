@@ -19,7 +19,7 @@ networks:
     driver: overlay
   nginx:
     external: true
-    name: loki_nginx
+    name: noiseblend_nginx
 
 services:
   couchdb:
