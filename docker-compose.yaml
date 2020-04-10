@@ -57,6 +57,7 @@ services:
     build:
       context: $NOISEBLEND_API_DIR
       dockerfile: Dockerfile-dev
+    image: noiseblend/api:latest
     configs:
       - source: noiseblend-v0.toml
         target: /root/.config/noiseblend/develop.toml
@@ -127,6 +128,7 @@ services:
       args:
         - SENTRY_DSN=https://7a3ddfbacc0c4e2d98f105aa0f184e0b@sentry.io/1209883
         - SENTRY_AUTH_TOKEN
+    image: noiseblend/ui:latest
     depends_on:
       - api
     environment:

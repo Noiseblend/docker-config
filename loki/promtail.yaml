@@ -25,14 +25,14 @@ scrape_configs:
           __path__: /var/log/lunar-analytics
     pipeline_stages:
       - match:
-          selector: '{name="lunar-analytics"} |~ ".* -$"'
+          selector: '{job="lunar-analytics"} |~ "-$"'
           action: drop
       - regex:
-          expression: '.*ts=(?P<timestamp>\S+) ip=(?P<ip>\S+) country=(?P<country>\S+) id=(?P<id>\S+) version=(?P<version>\S+) clamshell=(?P<clamshell>\S+) displays=(?P<displays>\S+) mode=(?P<mode>\S+) machine=(?P<machine>\S+).*'
+          expression: '.*ts=(?P<timestamp>\S+) (?P<msg>ip=(?P<ip>\S+) country=(?P<country>\S+) id=(?P<id>\S+) version=(?P<version>\S+) clamshell=(?P<clamshell>\S+) displays=(?P<displays>\S+) mode=(?P<mode>\S+) machine=(?P<machine>\S+)).*'
       - labels:
           ip:
-          country:
           id:
+          country:
           version:
           clamshell:
           displays:
@@ -41,3 +41,5 @@ scrape_configs:
       - timestamp:
           format: RFC3339
           source: timestamp
+      - output:
+          source: msg
