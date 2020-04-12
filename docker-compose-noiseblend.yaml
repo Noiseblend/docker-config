@@ -136,8 +136,8 @@ services:
       - redis
       - postgres
       - nginx
-    ports:
-      - "9003:9000"
+    # ports:
+    #   - "9003:9000"
     secrets:
       - redis_password-v0
       - redis_url-v0
@@ -159,8 +159,8 @@ services:
     image: postgres:11
     networks:
       - postgres
-    ports:
-      - "5434:5432"
+    # ports:
+    #   - "5434:5432"
     secrets:
       - postgres_password-v0
     volumes:
@@ -190,8 +190,8 @@ services:
       - frontend
       - backend
       - nginx
-    ports:
-      - "3003:3000"
+    # ports:
+    #   - "3003:3000"
     volumes:
       - yarn-data:/cache
 
@@ -207,8 +207,8 @@ services:
     image: redis:alpine
     networks:
       - redis
-    ports:
-      - "6383:6379"
+    # ports:
+    #   - "6383:6379"
     secrets:
       - redis_password-v0
     volumes:

@@ -27,8 +27,8 @@ services:
     image: klaemo/couchdb:2.0.0
     networks:
       - swarmpit
-    ports:
-      - "5986:5984"
+    # ports:
+    #   - "5986:5984"
     volumes:
       - couchdb-data:/opt/couchdb/data
 
@@ -41,8 +41,8 @@ services:
     networks:
       - swarmpit
       - nginx
-    ports:
-      - "888:8080"
+    # ports:
+    #   - "888:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - swarmpit-data:/var/lib/swarmpit

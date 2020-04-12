@@ -29,7 +29,7 @@ services:
   loki:
     image: grafana/loki:latest
     ports:
-      - "3100:3100"
+      - "3100"
     command: -config.file=/etc/loki/config.yaml
     configs:
       - source: loki-v0.yaml
@@ -57,8 +57,8 @@ services:
 
   grafana:
     image: grafana/grafana:master
-    ports:
-      - "3006:3000"
+    # ports:
+    #   - "3006:3000"
     networks:
       - loki
       - nginx

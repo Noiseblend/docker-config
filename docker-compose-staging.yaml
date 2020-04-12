@@ -107,8 +107,8 @@ services:
       nginx:
         aliases:
           - api-staging
-    ports:
-      - "9004:9000"
+    # ports:
+    #   - "9004:9000"
     secrets:
       - redis_password-v0
       - redis_url-v0
@@ -130,8 +130,8 @@ services:
     image: postgres
     networks:
       - postgres
-    ports:
-      - "5435:5432"
+    # ports:
+    #   - "5435:5432"
     secrets:
       - postgres_password-v0
     volumes:
@@ -167,8 +167,8 @@ services:
       nginx:
         aliases:
           - frontend-staging
-    ports:
-      - "3004:3000"
+    # ports:
+    #   - "3004:3000"
     volumes:
       - yarn-data:/cache
 
@@ -184,8 +184,8 @@ services:
     image: redis:alpine
     networks:
       - redis
-    ports:
-      - "6384:6379"
+    # ports:
+    #   - "6384:6379"
     secrets:
       - redis_password-v0
     volumes:
