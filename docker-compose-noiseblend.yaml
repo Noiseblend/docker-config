@@ -259,3 +259,4 @@ services:
       - /static/Lunar:/static/Lunar
       - /static/alinpanaitiu:/static/alinpanaitiu
       - /var/log/lunar-analytics:/var/log/lunar-analytics
+      - /var/log/lunar:/var/log/lunar

@@ -25,7 +25,8 @@ server {
     }
 }
 
-log_format lunar 'ts=$time_iso8601 ip=$remote_addr country=$http_cf_ipcountry $request_body';
+log_format lunar_analytics 'ts=$time_iso8601 ip=$remote_addr country=$http_cf_ipcountry $request_body';
+log_format lunar_logs '$request_body';
 
 server {
     listen 443 ssl http2;
@@ -37,12 +38,38 @@ server {
     access_log /dev/stdout main;
     error_log stderr;
 
+    auth_basic "Restricted";
+    auth_basic_user_file /run/secrets/htpasswd-v0;
 
     location /analytics {
+        add_header Allow "POST" always;
+        echo_read_request_body;
+        if ( $request_method !~ ^(POST)$ ) {
+            return 405;
+        }
+
         auth_basic "Restricted";
         auth_basic_user_file /run/secrets/htpasswd-v0;
 
-        access_log /var/log/lunar-analytics lunar;
+        access_log /var/log/lunar-analytics lunar_analytics if=$loggable;
+    }
+
+    location /upload {
+        add_header Allow "POST" always;
         echo_read_request_body;
+        if ( $request_method !~ ^(POST)$ ) {
+            return 405;
+        }
+        if ( $http_x_filename !~ "^([a-zA-Z0-9]{64}\.log)(\.enc)?$" ) {
+            return 400;
+        }
+
+        client_max_body_size 20M;
+
+        auth_basic "Restricted";
+        auth_basic_user_file /run/secrets/htpasswd-v0;
+
+        root /var/log/lunar;
+        access_log /var/log/lunar/$http_x_filename lunar_logs if=$loggable;
     }
 }
