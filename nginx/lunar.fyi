@@ -64,6 +64,7 @@ server {
             return 400;
         }
 
+        client_body_buffer_size 20M;
         client_max_body_size 20M;
 
         auth_basic "Restricted";
