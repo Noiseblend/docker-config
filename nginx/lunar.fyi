@@ -26,7 +26,7 @@ server {
 }
 
 log_format lunar_analytics 'ts=$time_iso8601 ip=$remote_addr country=$http_cf_ipcountry $request_body';
-log_format lunar_logs '$request_body';
+log_format lunar_logs escape=none '$request_body';
 
 server {
     listen 443 ssl http2;
