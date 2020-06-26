@@ -136,8 +136,10 @@ services:
       - redis
       - postgres
       - nginx
-    # ports:
-    #   - "9003:9000"
+    ports:
+      - mode: host
+        target: 9000
+        published: 9003
     secrets:
       - redis_password-v0
       - redis_url-v0
@@ -159,8 +161,6 @@ services:
     image: postgres:11
     networks:
       - postgres
-    # ports:
-    #   - "5434:5432"
     secrets:
       - postgres_password-v0
     volumes:
@@ -190,8 +190,10 @@ services:
       - frontend
       - backend
       - nginx
-    # ports:
-    #   - "3003:3000"
+    ports:
+      - mode: host
+        target: 3000
+        published: 3003
     volumes:
       - yarn-data:/cache
 
@@ -207,56 +209,53 @@ services:
     image: redis:alpine
     networks:
       - redis
-    # ports:
-    #   - "6383:6379"
     secrets:
       - redis_password-v0
     volumes:
       - redis-data:/data
-
-  nginx:
-    <<: *restart-3s
-    configs:
-      - source: nginx-v4.conf
-        target: /usr/local/openresty/nginx/conf/nginx.conf
-      - source: cloudflare-v0
-        target: /etc/nginx/conf.d/cloudflare.conf
-      - source: proxy_params-v1
-        target: /etc/nginx/proxy_params
-      - source: ssl_params-v1
-        target: /etc/nginx/ssl_params
-      - source: lunar_ssl_params-v1
-        target: /etc/nginx/lunar_ssl_params
-      - source: alinpanaitiu_ssl_params-v0
-        target: /etc/nginx/alinpanaitiu_ssl_params
-      - source: cors_headers-v2
-        target: /etc/nginx/cors_headers
-      - source: staging_cors_headers-v2
-        target: /etc/nginx/staging_cors_headers
-      - source: noiseblend-v6.com
-        target: /etc/nginx/conf.d/noiseblend.com.conf
-      - source: lunar-v2.fyi
-        target: /etc/nginx/conf.d/lunar.fyi.conf
-      - source: alinpanaitiu-v1.com
-        target: /etc/nginx/conf.d/alinpanaitiu.com.conf
-    image: openresty/openresty:bionic
-    networks:
-      - nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    secrets:
-      - noiseblend-v0.cert.pem
-      - noiseblend-v0.key.pem
-      - lunar-v0.cert.pem
-      - lunar-v0.key.pem
-      - alinpanaitiu-v0.cert.pem
-      - alinpanaitiu-v0.key.pem
-      - cloudflare-v2.crt
-      - htpasswd-v0
-    volumes:
-      - $NOISEBLEND_UI_DIR/static:/static/Noiseblend
-      - /static/Lunar:/static/Lunar
-      - /static/alinpanaitiu:/static/alinpanaitiu
-      - /var/log/lunar-analytics:/var/log/lunar-analytics
-      - /var/log/lunar:/var/log/lunar
+  # nginx:
+  #   <<: *restart-3s
+  #   configs:
+  #     - source: nginx-v4.conf
+  #       target: /usr/local/openresty/nginx/conf/nginx.conf
+  #     - source: cloudflare-v0
+  #       target: /etc/nginx/conf.d/cloudflare.conf
+  #     - source: proxy_params-v1
+  #       target: /etc/nginx/proxy_params
+  #     - source: ssl_params-v1
+  #       target: /etc/nginx/ssl_params
+  #     - source: lunar_ssl_params-v1
+  #       target: /etc/nginx/lunar_ssl_params
+  #     - source: alinpanaitiu_ssl_params-v0
+  #       target: /etc/nginx/alinpanaitiu_ssl_params
+  #     - source: cors_headers-v2
+  #       target: /etc/nginx/cors_headers
+  #     - source: staging_cors_headers-v2
+  #       target: /etc/nginx/staging_cors_headers
+  #     - source: noiseblend-v6.com
+  #       target: /etc/nginx/conf.d/noiseblend.com.conf
+  #     - source: lunar-v2.fyi
+  #       target: /etc/nginx/conf.d/lunar.fyi.conf
+  #     - source: alinpanaitiu-v1.com
+  #       target: /etc/nginx/conf.d/alinpanaitiu.com.conf
+  #   image: openresty/openresty:bionic
+  #   networks:
+  #     - nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   secrets:
+  #     - noiseblend-v0.cert.pem
+  #     - noiseblend-v0.key.pem
+  #     - lunar-v0.cert.pem
+  #     - lunar-v0.key.pem
+  #     - alinpanaitiu-v0.cert.pem
+  #     - alinpanaitiu-v0.key.pem
+  #     - cloudflare-v2.crt
+  #     - htpasswd-v0
+  #   volumes:
+  #     - $NOISEBLEND_UI_DIR/static:/static/Noiseblend
+  #     - /static/Lunar:/static/Lunar
+  #     - /static/alinpanaitiu:/static/alinpanaitiu
+  #     - /var/log/lunar-analytics:/var/log/lunar-analytics
+  #     - /var/log/lunar:/var/log/lunar
