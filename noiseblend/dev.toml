@@ -1,7 +1,7 @@
 [spotify]
 client_id = ""
 client_secret = ""
-redirect_uri = "http://localhost:3003"
+redirect_uri = "https://dev.noiseblend.com"
 scope = [
     "user-read-email",
     "user-read-private",
@@ -22,7 +22,7 @@ scope = [
 
 [api]
 cors = true
-allow_origins = ["http://localhost:3003"]
+allow_origins = []
 
 [db]
 create_tables = true

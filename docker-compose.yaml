@@ -88,7 +88,7 @@ services:
       - redis
       - postgres
     ports:
-      - "9003:9000"
+      - "9004:9000"
     secrets:
       - redis_password-v0
       - redis_url-v0
@@ -134,15 +134,15 @@ services:
     environment:
       NODE_ENV: development
       LOCAL_API_URL: http://api:9000/
-      REMOTE_API_URL: http://localhost:9003/
+      REMOTE_API_URL: https://devapi.noiseblend.com/
       LOCAL_WS_URL: ws://api:9000
-      REMOTE_WS_URL: ws://localhost:9003
-      DOMAIN: localhost:3003
+      REMOTE_WS_URL: wss://devapi.noiseblend.com
+      DOMAIN: devapi.noiseblend.com
     networks:
       - frontend
       - backend
     ports:
-      - "3003:3000"
+      - "3004:3000"
       - "4002:4002"
     volumes:
       - yarn-data:/cache
