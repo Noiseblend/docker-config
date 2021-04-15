@@ -14,7 +14,7 @@ services:
     build:
       context: $NOISEBLEND_API_DIR
       dockerfile: Dockerfile$NOISEBLEND_ENV
-    image: noiseblend/api:latest
+    image: noiseblend/api:${NOISEBLEND_ENV:-latest}
     container_name: noiseblend-api
     environment:
       SPFY_APP_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
@@ -62,7 +62,7 @@ services:
       args:
         - SENTRY_DSN=https://7a3ddfbacc0c4e2d98f105aa0f184e0b@sentry.io/1209883
         - SENTRY_AUTH_TOKEN
-    image: noiseblend/ui:latest
+    image: noiseblend/ui:${NOISEBLEND_ENV:-latest}
     container_name: noiseblend
     depends_on:
       - api
