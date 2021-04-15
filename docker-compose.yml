@@ -41,8 +41,8 @@ services:
       - pip:/cache
       - ./noiseblend/${NOISEBLEND_ENV:-production}.toml:/root/.config/noiseblend/develop.toml:ro
       - ./spfy/${NOISEBLEND_ENV:-production}.toml:/root/.config/spfy/develop.toml:ro
-      - $NOISEBLEND_API_DIR:/app${NOISEBLEND_ENV}
-      - $SPFY_DIR:/spfy
+      - ${NOISEBLEND_API_DIR:-./.empty}:/appdev
+      - ${SPFY_DIR:-./.empty}:/spfy
 
   postgres:
     environment:
@@ -80,7 +80,7 @@ services:
       - "${LIVERELOAD_PORT:-4001}:4002"
     volumes:
       - yarn:/cache
-      - $NOISEBLEND_UI_DIR:/app${NOISEBLEND_ENV}
+      - ${NOISEBLEND_UI_DIR:-./.empty}:/appdev
 
   redis:
     image: redis:alpine
