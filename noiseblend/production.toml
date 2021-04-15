@@ -54,7 +54,6 @@ maxsize = 20
 [redis.auth]
 host = "redis"
 port = 6379
-password = ""
 
 [alexa]
 auth_type = "basic"

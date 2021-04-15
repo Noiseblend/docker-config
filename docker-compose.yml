@@ -1,0 +1,92 @@
+version: "3.8"
+
+volumes:
+  db:
+  redis:
+  pip:
+  yarn:
+
+networks:
+  noiseblend:
+
+services:
+  api:
+    build:
+      context: $NOISEBLEND_API_DIR
+      dockerfile: Dockerfile$NOISEBLEND_ENV
+    image: noiseblend/api:latest
+    container_name: noiseblend-api
+    environment:
+      SPFY_APP_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPFY_APP_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      SPFY_UNSPLASH_AUTH_CLIENT_ID: ${UNSPLASH_CLIENT_ID}
+      SPFY_UNSPLASH_AUTH_CLIENT_SECRET: ${UNSPLASH_CLIENT_SECRET}
+      SPFY_REDIS_URL: redis://redis:6379/0
+      SPFY_DATABASE_CONNECTION_PASSWORD: ${POSTGRES_PASSWORD}
+
+      NOISEBLEND_SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      NOISEBLEND_SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      NOISEBLEND_DB_CONNECTION_PASSWORD: ${POSTGRES_PASSWORD}
+      NOISEBLEND_SENDGRID_APIKEY: ${SENDGRID_APIKEY}
+      NOISEBLEND_ALEXA_CLIENT_SECRET: ${ALEXA_CLIENT_SECRET}
+      NOISEBLEND_SENTRY_DSN: https://eca1bf29f7cd41e5b8dba3959b34e50b@sentry.io/1189338
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - noiseblend
+    ports:
+      - "${API_PORT:-9003}:9000"
+    volumes:
+      - pip:/cache
+      - ./noiseblend/${NOISEBLEND_ENV:-production}.toml:/root/.config/noiseblend/develop.toml:ro
+      - ./spfy/${NOISEBLEND_ENV:-production}.toml:/root/.config/spfy/develop.toml:ro
+      - $NOISEBLEND_API_DIR:/app${NOISEBLEND_ENV}
+      - $SPFY_DIR:/spfy
+
+  postgres:
+    environment:
+      POSTGRES_PASSWORD:
+    image: postgres
+    container_name: noiseblend-db
+    networks:
+      - noiseblend
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./postgres/init.d:/docker-entrypoint-initdb.d:ro
+
+  frontend:
+    build:
+      context: $NOISEBLEND_UI_DIR
+      dockerfile: Dockerfile$NOISEBLEND_ENV
+      args:
+        - SENTRY_DSN=https://7a3ddfbacc0c4e2d98f105aa0f184e0b@sentry.io/1209883
+        - SENTRY_AUTH_TOKEN
+    image: noiseblend/ui:latest
+    container_name: noiseblend
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      LOCAL_API_URL: http://api:9000/
+      REMOTE_API_URL: https://${NOISEBLEND_ENV}api.noiseblend.com/
+      LOCAL_WS_URL: ws://api:9000
+      REMOTE_WS_URL: wss://${NOISEBLEND_ENV}api.noiseblend.com
+      DOMAIN: ${NOISEBLEND_ENV}api.noiseblend.com
+    networks:
+      - noiseblend
+    ports:
+      - "${FRONTEND_PORT:-3003}:3000"
+      - "${LIVERELOAD_PORT:-4001}:4002"
+    volumes:
+      - yarn:/cache
+      - $NOISEBLEND_UI_DIR:/app${NOISEBLEND_ENV}
+
+  redis:
+    image: redis:alpine
+    container_name: noiseblend-redis
+    networks:
+      - noiseblend
+    volumes:
+      - redis:/data
+      - ./redis/redis.conf:/etc/redis.conf:ro

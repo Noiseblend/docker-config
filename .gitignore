@@ -3,3 +3,4 @@
 secrets/*
 !secrets/*.secret
 *.sublime-workspace
+.env
