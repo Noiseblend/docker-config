@@ -19,10 +19,6 @@ configs:
     file: ./redis/redis.conf
 
 secrets:
-  redis_password-v0:
-    file: ./secrets/redis_password
-  redis_url-v0:
-    file: ./secrets/redis_url
   spotify_client_id-v0:
     file: ./secrets/spotify_client_id
   spotify_client_secret-v0:
@@ -68,16 +64,13 @@ services:
       SPFY_APP_CLIENT_SECRET__FILE: /run/secrets/spotify_client_secret-v0
       SPFY_UNSPLASH_AUTH_CLIENT_ID__FILE: /run/secrets/unsplash_client_id-v0
       SPFY_UNSPLASH_AUTH_CLIENT_SECRET__FILE: /run/secrets/unsplash_client_id-v0
-      SPFY_REDIS_URL__FILE: /run/secrets/redis_url-v0
-      SPFY_REDIS_PASSWORD__FILE: /run/secrets/redis_password-v0
+      SPFY_REDIS_URL: redis://redis:6379/0
       SPFY_DATABASE_CONNECTION_PASSWORD__FILE: /run/secrets/postgres_password-v0
 
       NOISEBLEND_SPOTIFY_CLIENT_ID__FILE: /run/secrets/spotify_client_id-v0
       NOISEBLEND_SPOTIFY_CLIENT_SECRET__FILE: /run/secrets/spotify_client_secret-v0
       NOISEBLEND_DB_CONNECTION_PASSWORD__FILE: /run/secrets/postgres_password-v0
       NOISEBLEND_SENDGRID_APIKEY__FILE: /run/secrets/sendgrid_api_key-v0
-      NOISEBLEND_REDIS_AUTH_PASSWORD__FILE: /run/secrets/redis_password-v0
-      NOISEBLEND_WORKER_REDIS_AUTH_PASSWORD__FILE: /run/secrets/redis_password-v0
       NOISEBLEND_ALEXA_CLIENT_SECRET__FILE: /run/secrets/alexa_secret-v0
       NOISEBLEND_SENTRY_DSN__FILE: /run/secrets/sentry_dsn_api-v0
     depends_on:
@@ -90,8 +83,6 @@ services:
     ports:
       - "9004:9000"
     secrets:
-      - redis_password-v0
-      - redis_url-v0
       - spotify_client_id-v0
       - spotify_client_secret-v0
       - unsplash_client_id-v0
@@ -149,20 +140,12 @@ services:
       - $NOISEBLEND_UI_DIR:/app
 
   redis:
-    command:
-      - /bin/sh
-      - -c
-      - cat /etc/redis.conf | sed "s/# requirepass \"\"/requirepass \"$$( cat /run/secrets/redis_password-v0 )\"/g" | redis-server -
     configs:
       - source: redis-v0.conf
         target: /etc/redis.conf
     image: redis:alpine
     networks:
       - redis
-    ports:
-      - "6383:6379"
-    secrets:
-      - redis_password-v0
     volumes:
       - redis-data:/data
       - ./redis/redis.conf:/etc/redis.conf:ro

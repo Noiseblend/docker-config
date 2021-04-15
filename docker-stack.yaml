@@ -1,0 +1,124 @@
+version: "3.7"
+
+x-refs:
+  restart-3s: &restart-3s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+
+volumes:
+  db-data:
+    driver: local
+  redis-data:
+    driver: local
+  pip-data:
+    driver: local
+  yarn-data:
+    driver: local
+
+configs:
+  noiseblend-v0.toml:
+    file: ./noiseblend/production.toml
+  spfy-v0.toml:
+    file: ./spfy/production.toml
+  redis-v0.conf:
+    file: ./redis/redis.conf
+
+networks:
+  backend:
+    driver: overlay
+  frontend:
+    driver: overlay
+  postgres:
+    driver: overlay
+  redis:
+    driver: overlay
+
+services:
+  api:
+    <<: *restart-3s
+    build:
+      context: $NOISEBLEND_API_DIR
+      dockerfile: Dockerfile
+    image: noiseblend/api:latest
+    configs:
+      - source: noiseblend-v0.toml
+        target: /root/.config/noiseblend/develop.toml
+      - source: spfy-v0.toml
+        target: /root/.config/spfy/develop.toml
+    environment:
+      SPFY_APP_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPFY_APP_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      SPFY_UNSPLASH_AUTH_CLIENT_ID: ${UNSPLASH_CLIENT_ID}
+      SPFY_UNSPLASH_AUTH_CLIENT_SECRET: ${UNSPLASH_CLIENT_SECRET}
+      SPFY_REDIS_URL: redis://redis:6379/0
+      SPFY_DATABASE_CONNECTION_PASSWORD: ${POSTGRES_PASSWORD}
+
+      NOISEBLEND_SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      NOISEBLEND_SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+      NOISEBLEND_DB_CONNECTION_PASSWORD: ${POSTGRES_PASSWORD}
+      NOISEBLEND_SENDGRID_APIKEY: ${SENDGRID_APIKEY}
+      NOISEBLEND_ALEXA_CLIENT_SECRET: ${ALEXA_CLIENT_SECRET}
+      NOISEBLEND_SENTRY_DSN: https://eca1bf29f7cd41e5b8dba3959b34e50b@sentry.io/1189338
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - backend
+      - redis
+      - postgres
+    ports:
+      - "9003:9000"
+    volumes:
+      - pip-data:/cache
+
+  postgres:
+    <<: *restart-3s
+    environment:
+      POSTGRES_PASSWORD:
+    image: postgres:11
+    networks:
+      - postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./postgres/init.d:/docker-entrypoint-initdb.d:ro
+
+  frontend:
+    <<: *restart-3s
+    build:
+      context: $NOISEBLEND_UI_DIR
+      dockerfile: Dockerfile
+      args:
+        - SENTRY_DSN=https://7a3ddfbacc0c4e2d98f105aa0f184e0b@sentry.io/1209883
+        - SENTRY_AUTH_TOKEN
+        - SENTRY_RELEASE
+        - LOCAL_API_URL=http://api:9000/
+        - REMOTE_API_URL=https://api.noiseblend.com/
+        - LOCAL_WS_URL=ws://api:9000
+        - REMOTE_WS_URL=wss://api.noiseblend.com
+        - DOMAIN=www.noiseblend.com
+    image: noiseblend/ui:latest
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+    networks:
+      - frontend
+      - backend
+    ports:
+      - "3003:3000"
+    volumes:
+      - yarn-data:/cache
+
+  redis:
+    <<: *restart-3s
+    configs:
+      - source: redis-v0.conf
+        target: /etc/redis.conf
+    image: redis:alpine
+    networks:
+      - redis
+    volumes:
+      - redis-data:/data
