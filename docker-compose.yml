@@ -47,7 +47,7 @@ services:
   postgres:
     environment:
       POSTGRES_PASSWORD:
-    image: postgres
+    image: postgres:11
     container_name: noiseblend-db
     networks:
       - noiseblend
