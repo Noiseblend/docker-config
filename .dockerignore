@@ -1,0 +1,8 @@
+LICENSE
+README.md
+*.dwarf
+.editorconfig
+.gitsecret
+.env
+*.secret
+secrets/*
