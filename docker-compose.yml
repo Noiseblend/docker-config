@@ -41,7 +41,7 @@ services:
       NOISEBLEND_DB_CONNECTION_PASSWORD: ${POSTGRES_PASSWORD}
       NOISEBLEND_SENDGRID_APIKEY: ${SENDGRID_APIKEY}
       NOISEBLEND_ALEXA_CLIENT_SECRET: ${ALEXA_CLIENT_SECRET}
-      NOISEBLEND_SENTRY_DSN: https://eca1bf29f7cd41e5b8dba3959b34e50b@sentry.io/1189338
+      NOISEBLEND_SENTRY_DSN: https://eca1bf29f7cd41e5b8dba3959b34e50b@o84592.ingest.sentry.io/1189338
     depends_on:
       - redis
       - postgres
@@ -73,7 +73,7 @@ services:
       context: $NOISEBLEND_UI_DIR
       dockerfile: Dockerfile$NOISEBLEND_ENV
       args:
-        - SENTRY_DSN=https://7a3ddfbacc0c4e2d98f105aa0f184e0b@sentry.io/1209883
+        - SENTRY_DSN=https://3ce14c5eda584570954a7ba2156bb0af@o84592.ingest.sentry.io/1209883
         - SENTRY_AUTH_TOKEN
     image: noiseblend/ui:${NOISEBLEND_ENV:-latest}
     container_name: noiseblend
