@@ -1,0 +1,43 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+environment:
+  DOCKER_BUILDKIT: "1"
+
+steps:
+  - name: deploy
+    image: curlimages/curl
+    commands:
+      - curl -L -s -S https://alin:$${DEPLOY_PASSWORD}@deploy.darkwoods.win/noiseblend
+    environment:
+      DEPLOY_PASSWORD:
+        from_secret: deploy_password
+    when:
+      branch:
+        - master
+
+  - name: cloudflare
+    image: jetrails/drone-cloudflare-caching
+    settings:
+      api_token:
+        from_secret: cloudflare_cache_purge_token
+      zone_identifier: 4261720d9ab40fdc12b31ba8c63d6fdf
+      action: purge_everything
+    when:
+      branch:
+        - master
+    depends_on:
+      - deploy
+
+
+---
+kind: signature
+hmac: 11f3539e1003b0cb40ba1b1b50196ed24d623c8cc3ad6ce2e3ed03c0c69b0cde
+
+...
