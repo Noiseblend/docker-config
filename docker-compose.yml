@@ -27,6 +27,8 @@ services:
       dockerfile: Dockerfile$NOISEBLEND_ENV
     image: noiseblend/api:${NOISEBLEND_ENV:-latest}
     container_name: noiseblend-api
+    stdin_open: ${ATTACH_STDIN:-false}
+    tty: ${ATTACH_STDIN:-false}
     <<: *restart
     environment:
       SPFY_APP_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
